@@ -1,3 +1,5 @@
+require('dotenv-safe').config();
+
 const express = require('express')
 const app = express()
 const bodyparser = require('body-parser')
@@ -9,7 +11,7 @@ const Usuario = require('./app/models/usuario')
 const hateoasLink = require('express-hateoas-links')
 
 
-mongoose.connect('mongodb+srv://usrmongo:VsUERQhgdofSkrb5@cluster0-ejp7j.mongodb.net/ecommerce?retryWrites=true&w=majority', { useNewUrlParser: true })
+mongoose.connect('mongodb+srv://usrmongo:VsUERQhgdofSkrb5@cluster0-ejp7j.mongodb.net/ecommerce?retryWrites=true&w=majority', { useNewUrlParser: true ,useCreateIndex:true})
 
 app.use(bodyparser.urlencoded({ extended: true }))
 app.use(bodyparser.json())

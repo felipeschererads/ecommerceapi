@@ -11,14 +11,27 @@ module.exports = {
         res.status(502).json({ message: 'Erro ao recuperar os cupons ' + erro })
       } else {
 
-        
+        res.statusCode = 200;
+        res.json(cupons)
 
       }
     })
   },
+
+
   adicionar: (req, res) => {
 
-    let cupomDesconto = new Cupomdesconto(req.body);
+    let cupomDesconto;
+
+    try {
+
+      cupomDesconto = new Cupomdesconto(req.body);
+
+    } catch (e) {
+      //usuário mandou algo ilegal para aplicaçao
+      res.status(400).json(e)
+      return;
+    }
 
     /*cupomDesconto.dataInicial = req.body.dataInicial
     cupomDesconto.dataFinal =  req.body.dataFinal
@@ -27,6 +40,14 @@ module.exports = {
     cupomDesconto.quantidadeCupons = req.body.quantidadeCupons
     cupomDesconto.quantidadeUsada = req.body.quantidadeUsada
     cupomDesconto.percentualDesconto =  req.body.percentualDesconto*/
+
+    const erro = cupomDesconto.validateSync()
+
+    if (erro) {
+      console.log("")
+      res.status(400).json(erro)
+      return;
+    }
 
     cupomDesconto.save((erro) => {
       if (erro) {
@@ -38,16 +59,22 @@ module.exports = {
     })
   },
   listarUm: (req, res) => {
+    if(!ObjectId.isValid(req.params.cupons_id)){
+      res.status(400).json({
+        message: 'Código inválido'
+      })
+      return
+    }
 
     Cupomdesconto.findById(ObjectId(req.params.cupons_id), (error, cupomDesconto) => {
       if (error) {
         res.status(502).json(error)
       } else if (cupomDesconto) {
 
-        let url = req.protocol + '://'+req.get('host')+ req.originalUrl;
-        res.status(200).json(cupomDesconto,[
-          {rel: "altear",href: url,method: "PUT"},
-          {rel: "deletar",href: url,method: "DELETE", title: "excluir cupom de desconto"}
+        let url = req.protocol + '://' + req.get('host') + req.originalUrl;
+        res.status(200).json(cupomDesconto, [
+          { rel: "altear", href: url, method: "PUT" },
+          { rel: "deletar", href: url, method: "DELETE", title: "excluir cupom de desconto" }
         ])
 
       } else {
@@ -101,7 +128,9 @@ module.exports = {
     let id = req.params.cupons_id
     let cupomDesconto = req.body;
 
-    Cupomdesconto.updateOne({ _id: ObjectId(id) }, { $set: cupomDesconto }, (error) => {
+    const options = {runValidators: true};
+
+    Cupomdesconto.updateOne({ _id: ObjectId(id) }, { $set: cupomDesconto },options, (error) => {
       if (error) {
         res.status(400).json(error)
 
