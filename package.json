@@ -10,7 +10,7 @@
   "author": "Felipe Scherer",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "cross-env": "^5.2.0",
     "dotenv-safe": "^8.1.0",
     "express": "^4.17.1",
